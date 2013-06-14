@@ -12,6 +12,8 @@ module OmniAuth
       end
 
       info do
+        {
+        }
       end
 
       def request_phase
