@@ -1,3 +1,5 @@
+# NOTE: Used for a specific application at the moment, but good for reference
+
 # Omniauth::Cookie
 
 Strategy to authenticate against cookie
