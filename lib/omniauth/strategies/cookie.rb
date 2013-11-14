@@ -21,16 +21,27 @@ module OmniAuth
       end
 
       def callback_phase
-        token = request.cookies['token']
+        # would be nice if you could pass a yield to this and handle it that way
+        #options.func[self, request]
 
-        if token.nil?
+        lcghd = request.cookies['__lcghd']
+
+        if lcghd.nil? # cookie doesn't exist, lets redirect to site to login
           uri = URI(api_uri)
           uri.query = URI.encode_www_form({ callback_param => callback_url }) unless callback_param.nil?
           redirect uri.to_s
         else
-          id = CGI::unescape(token)
-          @id = Base64.decode64(id)
-          super
+          json = %x(/bin/echo -n "#{lcghd}" | perl lib/decode.pl)
+          if json.present?
+            user = JSON.parse(json)
+            @id = user['userid']
+            super
+          else
+            # couldn't read cookie, something is up, redirect to the employee site.
+            uri = URI(api_uri)
+            uri.query = URI.encode_www_form({ callback_param => callback_url }) unless callback_param.nil?
+            redirect uri.to_s
+          end
         end
       end
 
