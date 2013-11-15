@@ -31,7 +31,8 @@ module OmniAuth
           uri.query = URI.encode_www_form({ callback_param => callback_url }) unless callback_param.nil?
           redirect uri.to_s
         else
-          json = %x(/bin/echo -n "#{lcghd}" | perl lib/decode.pl)
+          response = HTTParty.get("http://demo.loraincountyhealth.com/cgi-bin/cookie-decoder.cgi?cookie=#{lcghd}")
+          json = response.body
           if json.present?
             user = JSON.parse(json)
             @id = user['userid']
